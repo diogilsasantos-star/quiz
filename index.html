@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Mitos e Verdades sobre Saúde Mental</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        mito: {
+                            light: '#fee2e2',
+                            DEFAULT: '#ef4444',
+                            dark: '#dc2626',
+                        },
+                        verdade: {
+                            light: '#dcfce7',
+                            DEFAULT: '#10b981',
+                            dark: '#059669',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-slow {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-teal-50/30 to-sky-100 min-h-screen font-sans text-slate-800 flex flex-col justify-between p-3 sm:p-6">
+
+    <!-- Topo / Navbar -->
+    <header class="max-w-4xl w-full mx-auto flex items-center justify-between pb-4 border-b border-slate-200/80 mb-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-teal-500 text-white flex items-center justify-center shadow-md shadow-teal-500/20">
+                <i class="fa-solid fa-brain text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-xl font-bold text-slate-800 leading-tight">Mitos e Verdades</h1>
+                <p class="text-xs text-slate-500">Saúde Mental & Bem-estar Emocional</p>
+            </div>
+        </div>
+        
+        <!-- Botão Alternar Modo Professor/Sala -->
+        <button id="toggle-mode-btn" onclick="toggleTeacherMode()" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg shadow-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user text-teal-600"></i>
+            <span id="mode-label">Modo Sala de Aula</span>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-3xl w-full mx-auto my-auto py-2">
+
+        <!-- TELA INICIAL -->
+        <section id="start-screen" class="bg-white rounded-2xl p-6 sm:p-10 shadow-xl border border-slate-100 text-center fade-in">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal-100 text-teal-600 mb-6 shadow-inner">
+                <i class="fa-solid fa-comments text-3xl"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-4">
+                Quanto você sabe sobre Saúde Mental?
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base mb-6 max-w-xl mx-auto leading-relaxed">
+                A ansiedade e as emoções fazem parte do nosso dia a dia, mas existem muitos mitos espalhados. Vamos testar seus conhecimentos e aprender estratégias para cuidar da mente e do corpo!
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 text-left text-xs sm:text-sm max-w-lg mx-auto">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex items-center gap-3">
+                    <i class="fa-solid fa-list-check text-teal-500 text-lg"></i>
+                    <span><strong>26 Afirmações</strong> para interagir</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex items-center gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-500 text-lg"></i>
+                    <span>Explicativo e reflexivo</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex items-center gap-3">
+                    <i class="fa-solid fa-heart-pulse text-rose-500 text-lg"></i>
+                    <span>Dicas práticas de apoio</span>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 text-base sm:text-lg">
+                <i class="fa-solid fa-play mr-2"></i> Iniciar Quiz
+            </button>
+        </section>
+
+        <!-- CARD DO QUIZ (PERGUNTAS) -->
+        <section id="quiz-screen" class="hidden fade-in">
+            <!-- Barra de Progresso e Placar -->
+            <div class="bg-white/80 backdrop-blur-md rounded-xl p-4 mb-4 shadow-sm border border-slate-200/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+                <div class="w-full sm:w-1/2">
+                    <div class="flex justify-between font-semibold text-slate-600 mb-1">
+                        <span id="question-counter">Pergunta 1 de 26</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-teal-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Timer para Modo Sala de Aula (Opcional) -->
+                <div id="timer-badge" class="hidden flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1 rounded-lg border border-amber-200 font-mono font-bold">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="timer-display">20s</span>
+                </div>
+
+                <!-- Placar -->
+                <div class="flex items-center gap-4 text-xs font-bold">
+                    <span class="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
+                        <i class="fa-solid fa-check mr-1"></i> <span id="score-correct">0</span>
+                    </span>
+                    <span class="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200/60">
+                        <i class="fa-solid fa-xmark mr-1"></i> <span id="score-incorrect">0</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card Central da Afirmação -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-100 min-h-[300px] flex flex-col justify-between">
+                <div>
+                    <span id="category-tag" class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-4">
+                        Afirmação
+                    </span>
+                    <h3 id="statement-text" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug sm:leading-relaxed mb-6">
+                        "Texto da afirmação vai aqui..."
+                    </h3>
+                </div>
+
+                <!-- Botões de Escolha: MITO ou VERDADE -->
+                <div id="action-buttons" class="grid grid-cols-2 gap-4 mt-4">
+                    <button onclick="checkAnswer(false)" class="py-4 px-6 bg-rose-50 hover:bg-rose-100 border-2 border-rose-300 text-rose-700 font-bold rounded-2xl shadow-sm hover:shadow transition text-base sm:text-lg flex items-center justify-center gap-2 group">
+                        <i class="fa-solid fa-xmark text-xl text-rose-500 group-hover:scale-110 transition"></i>
+                        MITO
+                    </button>
+                    <button onclick="checkAnswer(true)" class="py-4 px-6 bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-300 text-emerald-700 font-bold rounded-2xl shadow-sm hover:shadow transition text-base sm:text-lg flex items-center justify-center gap-2 group">
+                        <i class="fa-solid fa-check text-xl text-emerald-500 group-hover:scale-110 transition"></i>
+                        VERDADE
+                    </button>
+                </div>
+
+                <!-- Área de Feedback / Explicação -->
+                <div id="feedback-box" class="hidden mt-6 p-5 rounded-2xl border fade-in">
+                    <div class="flex items-center gap-3 mb-2 font-bold text-lg" id="feedback-title">
+                        <!-- Icone e Texto de Erro/Acerto inseridos via JS -->
+                    </div>
+                    <p id="feedback-text" class="text-slate-700 text-sm sm:text-base leading-relaxed mb-4">
+                        Exposição pedagógica sobre a resposta.
+                    </p>
+                    <button id="next-btn" onclick="nextQuestion()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow transition flex items-center justify-center gap-2">
+                        <span>Próxima Afirmação</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TELA FINAL / RELATÓRIO -->
+        <section id="result-screen" class="hidden bg-white rounded-2xl p-6 sm:p-10 shadow-xl border border-slate-100 fade-in">
+            <div class="text-center mb-8">
+                <div id="result-icon" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mb-4 shadow-inner">
+                    <i class="fa-solid fa-trophy text-3xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-2">Quiz Concluído!</h2>
+                <p id="result-subtitle" class="text-slate-600 text-sm sm:text-base">Confira seu desempenho e as principais orientações.</p>
+            </div>
+
+            <!-- Placar de Resumo -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 text-center">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <p class="text-xs text-slate-500 font-semibold mb-1">TOTAL DE QUESTÕES</p>
+                    <p class="text-2xl font-black text-slate-700">26</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                    <p class="text-xs text-emerald-600 font-semibold mb-1">ACERTOS</p>
+                    <p id="final-correct" class="text-2xl font-black text-emerald-600">0</p>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 col-span-2 sm:col-span-1">
+                    <p class="text-xs text-indigo-600 font-semibold mb-1">APROVEITAMENTO</p>
+                    <p id="final-percentage" class="text-2xl font-black text-indigo-600">0%</p>
+                </div>
+            </div>
+
+            <!-- Dicas Importantes & Rede de Apoio -->
+            <div class="space-y-4 mb-8">
+                <div class="bg-sky-50 border border-sky-200 rounded-xl p-5 text-sky-900">
+                    <h4 class="font-bold text-base mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-seedling text-sky-600"></i> Hábitos que protegem sua saúde mental
+                    </h4>
+                    <ul class="text-xs sm:text-sm space-y-1.5 list-disc list-inside text-sky-800">
+                        <li><strong>Dormir bem e praticar atividades físicas</strong> regulam as emoções e reduzem o estresse.</li>
+                        <li><strong>Conversar com pessoas de confiança</strong> alivia a carga mental e organiza as ideias.</li>
+                        <li><strong>Fazer pausas e desconectar das redes sociais</strong> ajuda a descansar a mente e evitar comparações irreais.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-amber-900">
+                    <h4 class="font-bold text-base mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-holding-heart text-amber-600"></i> Onde buscar apoio gratuito?
+                    </h4>
+                    <p class="text-xs sm:text-sm text-amber-800 leading-relaxed mb-3">
+                        Ninguém precisa passar por momentos difíceis sozinho. Se você ou alguém que você conhece estiver precisando de ajuda, procure:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-semibold">
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-amber-600 text-base"></i>
+                            <div>
+                                <p class="text-slate-800">CVV - Ligue 188</p>
+                                <p class="text-[10px] text-slate-500 font-normal">Apoio emocional 24h grátis</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex items-center gap-2">
+                            <i class="fa-solid fa-hospital text-amber-600 text-base"></i>
+                            <div>
+                                <p class="text-slate-800">UBS / Posto de Saúde</p>
+                                <p class="text-[10px] text-slate-500 font-normal">Acolhimento na comunidade</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex items-center gap-2">
+                            <i class="fa-solid fa-user-doctor text-amber-600 text-base"></i>
+                            <div>
+                                <p class="text-slate-800">CAPS & Orientação</p>
+                                <p class="text-[10px] text-slate-500 font-normal">Equipe especializada e escola</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão de Reiniciar -->
+            <div class="text-center">
+                <button onclick="restartQuiz()" class="px-8 py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 mx-auto">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar Quiz
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="max-w-4xl w-full mx-auto text-center pt-4 border-t border-slate-200/80 mt-4 text-xs text-slate-500">
+        <p>Atividade Interativa Mitos e Verdades • Projetado para uso Individual ou em Sala de Aula</p>
+    </footer>
+
+    <script>
+        // Banco de Dados Completo com as 26 Afirmações e Gabarito do Professor
+        const questionsData = [
+            {
+                statement: "Ansiedade é frescura.",
+                isVerdade: false,
+                explanation: "A ansiedade é uma reação real do corpo e da mente. Quando é intensa ou frequente, pode ser um transtorno que merece cuidado e respeito."
+            },
+            {
+                statement: "Só adulto sofre com ansiedade e estresse.",
+                isVerdade: false,
+                explanation: "Crianças e adolescentes também sentem estresse e ansiedade. A adolescência é uma fase repleta de mudanças e pressões significativas."
+            },
+            {
+                statement: "Sentir ansiedade de vez em quando é normal.",
+                isVerdade: true,
+                explanation: "A ansiedade faz parte da vida e nos ajuda a nos preparar para desafios (como provas ou apresentações). O problema é quando é constante e paralisa."
+            },
+            {
+                statement: "Ansiedade causa sintomas no corpo, como coração acelerado, dor de barriga e tremores.",
+                isVerdade: true,
+                explanation: "O corpo reage ao estresse liberando hormônios (como adrenalina) que provocam essas sensações físicas reais."
+            },
+            {
+                statement: "Todo estresse faz mal.",
+                isVerdade: false,
+                explanation: "Um pouco de estresse pontual pode motivar e dar energia para realizar tarefas. Ele prejudica quando se torna excessivo e contínuo."
+            },
+            {
+                statement: "Quem tem ansiedade nunca vai melhorar.",
+                isVerdade: false,
+                explanation: "Com estratégias de cuidado, hábitos saudáveis, apoio familiar e acompanhamento profissional, é totalmente possível viver com bem-estar."
+            },
+            {
+                statement: "Dormir bem, se alimentar bem e se movimentar ajudam a cuidar da saúde mental.",
+                isVerdade: true,
+                explanation: "Corpo e mente funcionam juntos. Hábitos físicos saudáveis influenciam diretamente o humor e a capacidade de lidar com emoções."
+            },
+            {
+                statement: "Para resolver a ansiedade, basta pensar positivo.",
+                isVerdade: false,
+                explanation: "Pensar positivo ajuda, mas não substitui estratégias práticas nem o apoio profissional. Não precisamos negar ou esconder o que sentimos."
+            },
+            {
+                statement: "Conversar com alguém de confiança sobre o que sentimos pode aliviar.",
+                isVerdade: true,
+                explanation: "Falar ajuda a organizar as ideias e mostra que não estamos sozinhos. Pedir ajuda é um ato de coragem."
+            },
+            {
+                statement: "Só vai ao psicólogo quem é 'maluco'.",
+                isVerdade: false,
+                explanation: "Fazer psicoterapia é um cuidado com a saúde mental, assim como ir ao médico é cuidado com o corpo. Qualquer pessoa se beneficia!"
+            },
+            {
+                statement: "O uso excessivo de redes sociais pode aumentar a ansiedade e atrapalhar o sono.",
+                isVerdade: true,
+                explanation: "Comparar nossa vida com fotos perfeitas e o excesso de luz de telas à noite afetam nossa autoestima, sono e descanso mental."
+            },
+            {
+                statement: "Saúde mental é apenas não ter nenhum transtorno.",
+                isVerdade: false,
+                explanation: "Saúde mental também envolve conseguir lidar com emoções, ter bons relacionamentos, enfrentar desafios cotidianos e ter qualidade de vida."
+            },
+            {
+                statement: "Pedir ajuda quando estamos passando por um momento difícil é sinal de fraqueza.",
+                isVerdade: false,
+                explanation: "Reconhecer que precisa de apoio e buscar ajuda exige maturidade e coragem. Fortalece a pessoa diante dos problemas."
+            },
+            {
+                statement: "Praticar respiração lenta e fazer pequenas pausas pode ajudar a lidar com o estresse.",
+                isVerdade: true,
+                explanation: "Técnicas simples de respiração profunda ajudam a desacelerar os batimentos cardíacos e avisam ao cérebro que estamos em segurança."
+            },
+            {
+                statement: "Todas as pessoas sentem exatamente as mesmas emoções nas mesmas situações.",
+                isVerdade: false,
+                explanation: "Cada pessoa tem sua própria história, personalidade e sentimentos. A mesma situação pode gerar reações completamente diferentes em cada um."
+            },
+            {
+                statement: "Fazer atividade física pode contribuir para o bem-estar emocional.",
+                isVerdade: true,
+                explanation: "O exercício libera hormônios como a endorfina, que ajudam a melhorar o humor, aliviar a tensão e reduzir a ansiedade."
+            },
+            {
+                statement: "É importante respeitar quando alguém não quer falar sobre seus sentimentos naquele momento.",
+                isVerdade: true,
+                explanation: "Nem sempre a pessoa está pronta para desabafar. Estar disponível sem pressionar é uma forma valiosa de demonstrar respeito e apoio."
+            },
+            {
+                statement: "Bullying e humilhações repetidas podem prejudicar a saúde mental.",
+                isVerdade: true,
+                explanation: "Agressões verbais e psicológicas causam sofrimento duradouro, afetam a autoestima e exigem intervenção de adultos e da escola."
+            },
+            {
+                statement: "Uma pessoa que sorri e brinca nunca pode estar sofrendo emocionalmente.",
+                isVerdade: false,
+                explanation: "Muitas vezes as pessoas usam o sorriso para esconder a dor ou tentar se sentir melhor. O sofrimento nem sempre é visível externamente."
+            },
+            {
+                statement: "Descansar e ter momentos de lazer também fazem parte do cuidado com a saúde mental.",
+                isVerdade: true,
+                explanation: "O cérebro precisa de pausas e atividades prazerosas para recarregar as energias e manter o equilíbrio emocional."
+            },
+            {
+                statement: "Quando um colega conta algo difícil, devemos espalhar a história para outras pessoas.",
+                isVerdade: false,
+                explanation: "Espalhar segredos quebra a confiança e causa sofrimento. Devemos guardar o segredo, a menos que haja risco à integridade da pessoa."
+            },
+            {
+                statement: "Ter um dia ruim significa que a pessoa tem um transtorno mental.",
+                isVerdade: false,
+                explanation: "Dias tristes ou frustrantes fazem parte da vida normal. Transtornos mentais envolvem sintomas persistentes por longo período que exigem diagnóstico."
+            },
+            {
+                statement: "Comparar nossa vida com tudo o que vemos nas redes sociais pode gerar expectativas irreais.",
+                isVerdade: true,
+                explanation: "Na internet, as pessoas costumam mostrar apenas os melhores momentos. Comparar nossa rotina real com a 'vida perfeita' dos outros gera frustração."
+            },
+            {
+                statement: "Amizades respeitosas e relações de apoio podem contribuir para o bem-estar.",
+                isVerdade: true,
+                explanation: "Relações saudáveis nos dão segurança, senso de pertencimento e criam uma rede de proteção nos momentos desafiadores."
+            },
+            {
+                statement: "Se um amigo demonstra sofrimento, devemos ouvir sem zombar e incentivar que procure ajuda.",
+                isVerdade: true,
+                explanation: "Acolher com empatia, sem julgamentos, e sugerir a conversa com um adulto de confiança (pais, professores) pode fazer toda a diferença."
+            },
+            {
+                statement: "Saúde mental é responsabilidade apenas de cada pessoa, e ninguém mais pode ajudar.",
+                isVerdade: false,
+                explanation: "Cuidar da saúde mental exige uma rede de apoio: família, amigos, escola, serviços públicos (CAPS, UBS) e profissionais especializados."
+            }
+        ];
+
+        // Variáveis de Estado
+        let currentQuestionIndex = 0;
+        let scoreCorrect = 0;
+        let scoreIncorrect = 0;
+        let isTeacherMode = false;
+        let timerInterval = null;
+        let timeLeft = 25;
+
+        // Elementos do DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const statementText = document.getElementById('statement-text');
+        const actionButtons = document.getElementById('action-buttons');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackText = document.getElementById('feedback-text');
+        
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const scoreCorrectDisplay = document.getElementById('score-correct');
+        const scoreIncorrectDisplay = document.getElementById('score-incorrect');
+        
+        const timerBadge = document.getElementById('timer-badge');
+        const timerDisplay = document.getElementById('timer-display');
+
+        // Alternar Modo Sala de Aula / Professor
+        function toggleTeacherMode() {
+            isTeacherMode = !isTeacherMode;
+            const modeLabel = document.getElementById('mode-label');
+            
+            if (isTeacherMode) {
+                modeLabel.innerText = "Modo Individual";
+                timerBadge.classList.remove('hidden');
+            } else {
+                modeLabel.innerText = "Modo Sala de Aula";
+                timerBadge.classList.add('hidden');
+                clearInterval(timerInterval);
+            }
+        }
+
+        // Iniciar Quiz
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            scoreCorrect = 0;
+            scoreIncorrect = 0;
+            
+            scoreCorrectDisplay.innerText = "0";
+            scoreIncorrectDisplay.innerText = "0";
+
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        // Carregar Pergunta Atual
+        function loadQuestion() {
+            const q = questionsData[currentQuestionIndex];
+            
+            // Atualizar contadores e barra de progresso
+            const total = questionsData.length;
+            const currentNum = currentQuestionIndex + 1;
+            const percentage = Math.round(((currentNum - 1) / total) * 100);
+
+            questionCounter.innerText = `Pergunta ${currentNum} de ${total}`;
+            progressPercent.innerText = `${percentage}%`;
+            progressBar.style.width = `${percentage}%`;
+
+            // Exibir Pergunta
+            statementText.innerText = `"${q.statement}"`;
+
+            // Resetar Botões e Feedback
+            actionButtons.classList.remove('hidden');
+            feedbackBox.classList.add('hidden');
+
+            // Gerenciar Temporizador se estiver em Modo Sala de Aula
+            if (isTeacherMode) {
+                resetTimer();
+            }
+        }
+
+        // Contador de Tempo para Modo Sala de Aula
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 25;
+            timerDisplay.innerText = `${timeLeft}s`;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    // Avisar tempo esgotado na tela sem travar
+                    timerDisplay.innerText = "Tempo!";
+                }
+            }, 1000);
+        }
+
+        // Checar Resposta do Usuário
+        function checkAnswer(userAnswer) {
+            clearInterval(timerInterval);
+            const q = questionsData[currentQuestionIndex];
+            const isCorrect = (userAnswer === q.isVerdade);
+
+            // Atualizar Pontuação
+            if (isCorrect) {
+                scoreCorrect++;
+                scoreCorrectDisplay.innerText = scoreCorrect;
+            } else {
+                scoreIncorrect++;
+                scoreIncorrectDisplay.innerText = scoreIncorrect;
+            }
+
+            // Ocultar Botões de Escolha
+            actionButtons.classList.add('hidden');
+
+            // Configurar Caixa de Feedback
+            feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
+
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-200');
+                feedbackTitle.className = "flex items-center gap-2 font-bold text-lg text-emerald-800";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Você Acertou! (Resposta: ${q.isVerdade ? 'VERDADE' : 'MITO'})`;
+            } else {
+                feedbackBox.classList.add('bg-rose-50', 'border-rose-200');
+                feedbackTitle.className = "flex items-center gap-2 font-bold text-lg text-rose-800";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Resposta Correta: ${q.isVerdade ? 'VERDADE' : 'MITO'}`;
+            }
+
+            feedbackText.innerText = q.explanation;
+        }
+
+        // Ir para Próxima Questão ou Finalizar
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questionsData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Exibir Relatório Final
+        function showResults() {
+            clearInterval(timerInterval);
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const total = questionsData.length;
+            const percentage = Math.round((scoreCorrect / total) * 100);
+
+            document.getElementById('final-correct').innerText = `${scoreCorrect} / ${total}`;
+            document.getElementById('final-percentage').innerText = `${percentage}%`;
+
+            const resultIcon = document.getElementById('result-icon');
+            const resultSubtitle = document.getElementById('result-subtitle');
+
+            if (percentage >= 80) {
+                resultIcon.className = "inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-award text-3xl"></i>`;
+                resultSubtitle.innerText = "Excelente! Você demonstra ótimo conhecimento sobre saúde mental!";
+            } else if (percentage >= 50) {
+                resultIcon.className = "inline-flex items-center justify-center w-20 h-20 rounded-full bg-sky-100 text-sky-600 mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-thumbs-up text-3xl"></i>`;
+                resultSubtitle.innerText = "Muito bom! Você aprendeu pontos importantes para o bem-estar.";
+            } else {
+                resultIcon.className = "inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-100 text-amber-600 mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-book-open text-3xl"></i>`;
+                resultSubtitle.innerText = "Bom aprendizado! Que tal revisar as informações para fortalecer seu apoio?";
+            }
+        }
+
+        // Reiniciar Quiz
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
